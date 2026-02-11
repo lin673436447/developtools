@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevelopTools - 程序员实用工具集合</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#06b6d4',
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+        
+        .tool-card.active {
+            border-color: #6366f1;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-border {
+            position: relative;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #818cf8, #a78bfa);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+        }
+        
+        .input-field {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+        
+        .strength-weak { background: #ef4444; }
+        .strength-fair { background: #f59e0b; }
+        .strength-good { background: #10b981; }
+        .strength-strong { background: #06b6d4; }
+        
+        .regex-match {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 2px;
+        }
+        
+        .color-preview {
+            transition: all 0.3s ease;
+        }
+        
+        .toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-gray-100 min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 glass-panel border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">DevelopTools</h1>
+                        <p class="text-xs text-gray-400">程序员实用工具集合</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Tool Navigation -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <button onclick="switchTool('json')" id="nav-json" class="tool-card active glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">JSON格式化</span>
+            </button>
+            
+            <button onclick="switchTool('timestamp')" id="nav-timestamp" class="tool-card glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">时间戳转换</span>
+            </button>
+            
+            <button onclick="switchTool('color')" id="nav-color" class="tool-card glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">颜色转换</span>
+            </button>
+            
+            <button onclick="switchTool('base64')" id="nav-base64" class="tool-card glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">Base64</span>
+            </button>
+            
+            <button onclick="switchTool('regex')" id="nav-regex" class="tool-card glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">正则测试</span>
+            </button>
+            
+            <button onclick="switchTool('password')" id="nav-password" class="tool-card glass-panel rounded-xl p-4 text-center cursor-pointer">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium">密码生成器</span>
+            </button>
+        </div>
+
+        <!-- Tool Content Area -->
+        <div id="tool-content" class="glass-panel rounded-2xl p-6 min-h-[500px]">
+            <!-- JSON Formatter Tool -->
+            <div id="tool-json" class="tool-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </span>
+                        JSON格式化工具
+                    </h2>
+                    <div class="flex space-x-2">
+                        <button onclick="jsonFormat()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            格式化
+                        </button>
+                        <button onclick="jsonCompress()" class="px-4 py-2 rounded-lg text-sm font-medium bg-dark-700 hover:bg-dark-600 transition-colors">
+                            压缩
+                        </button>
+                        <button onclick="jsonClear()" class="px-4 py-2 rounded-lg text-sm font-medium bg-dark-700 hover:bg-dark-600 transition-colors">
+                            清空
+                        </button>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">输入 JSON</label>
+                        <textarea id="json-input" class="input-field w-full h-80 rounded-xl p-4 font-mono text-sm resize-none custom-scrollbar" placeholder="请输入需要格式化的JSON..."></textarea>
+                        <div id="json-error" class="mt-2 text-red-400 text-sm hidden"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">格式化结果</label>
+                        <div class="relative">
+                            <textarea id="json-output" class="input-field w-full h-80 rounded-xl p-4 font-mono text-sm resize-none custom-scrollbar" readonly></textarea>
+                            <button onclick="copyToClipboard('json-output')" class="absolute top-3 right-3 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" title="复制">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timestamp Converter Tool -->
+            <div id="tool-timestamp" class="tool-section hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </span>
+                        时间戳转换工具
+                    </h2>
+                    <div class="text-sm text-gray-400" id="current-time"></div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="glass-panel rounded-xl p-4">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">时间戳转日期</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="timestamp-input" class="input-field flex-1 rounded-lg px-4 py-2 font-mono" placeholder="输入时间戳(秒或毫秒)">
+                                <button onclick="timestampToDate()" class="btn-primary px-4 py-2 rounded-lg">转换</button>
+                            </div>
+                            <div class="mt-3 p-3 rounded-lg bg-dark-800" id="timestamp-result"></div>
+                        </div>
+                        
+                        <div class="glass-panel rounded-xl p-4">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">日期转时间戳</label>
+                            <div class="flex space-x-2">
+                                <input type="datetime-local" id="date-input" class="input-field flex-1 rounded-lg px-4 py-2" step="1">
+                                <button onclick="dateToTimestamp()" class="btn-primary px-4 py-2 rounded-lg">转换</button>
+                            </div>
+                            <div class="mt-3 p-3 rounded-lg bg-dark-800" id="date-result"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel rounded-xl p-4">
+                        <h3 class="text-lg font-semibold mb-4">常用时间格式</h3>
+                        <div class="space-y-3" id="common-formats">
+                            <div class="flex justify-between items-center p-3 rounded-lg bg-dark-800">
+                                <span class="text-gray-400">当前时间戳(秒)</span>
+                                <span class="font-mono text-accent" id="ts-seconds"></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 rounded-lg bg-dark-800">
+                                <span class="text-gray-400">当前时间戳(毫秒)</span>
+                                <span class="font-mono text-accent" id="ts-milliseconds"></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 rounded-lg bg-dark-800">
+                                <span class="text-gray-400">ISO 8601</span>
+                                <span class="font-mono text-accent text-sm" id="ts-iso"></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 rounded-lg bg-dark-800">
+                                <span class="text-gray-400">本地时间</span>
+                                <span class="font-mono text-accent text-sm" id="ts-local"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Converter Tool -->
+            <div id="tool-color" class="tool-section hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                            </svg>
+                        </span>
+                        颜色代码转换工具
+                    </h2>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="glass-panel rounded-xl p-4">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">HEX</label>
+                                    <div class="flex space-x-2">
+                                        <span class="flex items-center text-gray-500">#</span>
+                                        <input type="text" id="color-hex" class="input-field flex-1 rounded-lg px-3 py-2 font-mono uppercase" placeholder="FF5733" maxlength="8">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">RGB</label>
+                                    <input type="text" id="color-rgb" class="input-field w-full rounded-lg px-3 py-2 font-mono" placeholder="255, 87, 51">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">HSL</label>
+                                    <input type="text" id="color-hsl" class="input-field w-full rounded-lg px-3 py-2 font-mono" placeholder="9, 100%, 60%">
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center space-x-4">
+                                <label class="text-sm text-gray-400">透明度:</label>
+                                <input type="range" id="color-alpha" min="0" max="100" value="100" class="flex-1">
+                                <span id="alpha-value" class="text-sm font-mono w-12">100%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-panel rounded-xl p-4">
+                            <h3 class="text-lg font-semibold mb-3">CSS代码</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-2 rounded-lg bg-dark-800">
+                                    <code class="font-mono text-sm" id="css-hex"></code>
+                                    <button onclick="copyText(document.getElementById('css-hex').textContent)" class="p-1 hover:bg-dark-700 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded-lg bg-dark-800">
+                                    <code class="font-mono text-sm" id="css-rgb"></code>
+                                    <button onclick="copyText(document.getElementById('css-rgb').textContent)" class="p-1 hover:bg-dark-700 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded-lg bg-dark-800">
+                                    <code class="font-mono text-sm" id="css-hsl"></code>
+                                    <button onclick="copyText(document.getElementById('css-hsl').textContent)" class="p-1 hover:bg-dark-700 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="glass-panel rounded-xl p-4">
+                            <h3 class="text-lg font-semibold mb-3">颜色预览</h3>
+                            <div id="color-preview" class="w-full h-32 rounded-xl color-preview border-2 border-white/10"></div>
+                            <div class="mt-3 text-center">
+                                <span id="color-name" class="text-sm text-gray-400">选择颜色</span>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-panel rounded-xl p-4">
+                            <h3 class="text-lg font-semibold mb-3">常用颜色</h3>
+                            <div class="grid grid-cols-5 gap-2">
+                                <button onclick="setColor('#FF5733')" class="w-8 h-8 rounded-lg bg-[#FF5733] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#33FF57')" class="w-8 h-8 rounded-lg bg-[#33FF57] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#3357FF')" class="w-8 h-8 rounded-lg bg-[#3357FF] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#FF33F5')" class="w-8 h-8 rounded-lg bg-[#FF33F5] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#33FFF5')" class="w-8 h-8 rounded-lg bg-[#33FFF5] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#F5FF33')" class="w-8 h-8 rounded-lg bg-[#F5FF33] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#FF3333')" class="w-8 h-8 rounded-lg bg-[#FF3333] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#33FF33')" class="w-8 h-8 rounded-lg bg-[#33FF33] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#3333FF')" class="w-8 h-8 rounded-lg bg-[#3333FF] hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#000000')" class="w-8 h-8 rounded-lg bg-black border border-white/20 hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#FFFFFF')" class="w-8 h-8 rounded-lg bg-white hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#808080')" class="w-8 h-8 rounded-lg bg-gray-500 hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#FFA500')" class="w-8 h-8 rounded-lg bg-orange-500 hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#800080')" class="w-8 h-8 rounded-lg bg-purple-600 hover:scale-110 transition-transform"></button>
+                                <button onclick="setColor('#FFC0CB')" class="w-8 h-8 rounded-lg bg-pink-300 hover:scale-110 transition-transform"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Base64 Tool -->
+            <div id="tool-base64" class="tool-section hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            </svg>
+                        </span>
+                        Base64编码解码工具
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 text-sm">
+                            <input type="checkbox" id="base64-urlsafe" class="rounded bg-dark-700 border-dark-600">
+                            <span>URL安全模式</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">原文本</label>
+                            <textarea id="base64-text" class="input-field w-full h-40 rounded-xl p-4 font-mono text-sm resize-none custom-scrollbar" placeholder="输入要编码的文本..."></textarea>
+                        </div>
+                        <button onclick="textToBase64()" class="w-full btn-primary py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            <span>编码为 Base64</span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Base64</label>
+                            <div class="relative">
+                                <textarea id="base64-encoded" class="input-field w-full h-40 rounded-xl p-4 font-mono text-sm resize-none custom-scrollbar" placeholder="输入要解码的Base64..."></textarea>
+                                <button onclick="copyToClipboard('base64-encoded')" class="absolute top-3 right-3 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="base64ToText()" class="w-full py-3 rounded-xl font-medium flex items-center justify-center space-x-2 bg-dark-700 hover:bg-dark-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            </svg>
+                            <span>解码为文本</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-6 glass-panel rounded-xl p-4">
+                    <h3 class="text-lg font-semibold mb-3">编码信息</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="p-3 rounded-lg bg-dark-800">
+                            <div class="text-2xl font-bold text-accent" id="base64-char-count">0</div>
+                            <div class="text-xs text-gray-400">字符数</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-dark-800">
+                            <div class="text-2xl font-bold text-accent" id="base64-byte-count">0</div>
+                            <div class="text-xs text-gray-400">字节数</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-dark-800">
+                            <div class="text-2xl font-bold text-accent" id="base64-ratio">0%</div>
+                            <div class="text-xs text-gray-400">编码膨胀率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regex Tester Tool -->
+            <div id="tool-regex" class="tool-section hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                        </span>
+                        正则表达式测试器
+                    </h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="glass-panel rounded-xl p-4">
+                        <label class="block text-sm font-medium text-gray-400 mb-2">正则表达式</label>
+                        <div class="flex space-x-2">
+                            <span class="flex items-center text-gray-500 text-lg">/</span>
+                            <input type="text" id="regex-pattern" class="input-field flex-1 rounded-lg px-4 py-2 font-mono" placeholder="输入正则表达式">
+                            <span class="flex items-center text-gray-500 text-lg">/</span>
+                            <input type="text" id="regex-flags" class="input-field w-24 rounded-lg px-3 py-2 font-mono" placeholder="flags" value="g">
+                        </div>
+                        <div class="flex items-center space-x-4 mt-3">
+                            <label class="flex items-center space-x-1 text-sm cursor-pointer">
+                                <input type="checkbox" id="flag-g" checked class="rounded bg-dark-700" onchange="updateRegexFlags()">
+                                <span>g (全局)</span>
+                            </label>
+                            <label class="flex items-center space-x-1 text-sm cursor-pointer">
+                                <input type="checkbox" id="flag-i" class="rounded bg-dark-700" onchange="updateRegexFlags()">
+                                <span>i (忽略大小写)</span>
+                            </label>
+                            <label class="flex items-center space-x-1 text-sm cursor-pointer">
+                                <input type="checkbox" id="flag-m" class="rounded bg-dark-700" onchange="updateRegexFlags()">
+                                <span>m (多行)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">测试文本</label>
+                            <textarea id="regex-text" class="input-field w-full h-48 rounded-xl p-4 font-mono text-sm resize-none custom-scrollbar" placeholder="输入要测试的文本..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">匹配结果</label>
+                            <div id="regex-result" class="input-field w-full h-48 rounded-xl p-4 font-mono text-sm overflow-auto custom-scrollbar">
+                                <span class="text-gray-500">输入正则表达式和测试文本查看结果...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel rounded-xl p-4">
+                        <h3 class="text-lg font-semibold mb-3">常用正则表达式</h3>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <button onclick="setRegex('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">邮箱地址</div>
+                                <code class="text-xs text-gray-400">^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$</code>
+                            </button>
+                            <button onclick="setRegex('^1[3-9]\\d{9}$')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">手机号</div>
+                                <code class="text-xs text-gray-400">^1[3-9]\\d{9}$</code>
+                            </button>
+                            <button onclick="setRegex('^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">URL</div>
+                                <code class="text-xs text-gray-400">^(https?://)?...</code>
+                            </button>
+                            <button onclick="setRegex('^\\d{4}-\\d{2}-\\d{2}$')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">日期 (YYYY-MM-DD)</div>
+                                <code class="text-xs text-gray-400">^\\d{4}-\\d{2}-\\d{2}$</code>
+                            </button>
+                            <button onclick="setRegex('\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">IP地址</div>
+                                <code class="text-xs text-gray-400">\\b\\d{1,3}(\\.\\d{1,3}){3}\\b</code>
+                            </button>
+                            <button onclick="setRegex('^[a-zA-Z_$][a-zA-Z0-9_$]*$')" class="p-3 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-left">
+                                <div class="font-medium text-sm">变量名</div>
+                                <code class="text-xs text-gray-400">^[a-zA-Z_$][a-zA-Z0-9_$]*$</code>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Generator Tool -->
+            <div id="tool-password" class="tool-section hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </span>
+                        密码生成器
+                    </h2>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="glass-panel rounded-xl p-6">
+                            <div class="text-center mb-6">
+                                <div id="password-display" class="text-3xl md:text-4xl font-mono font-bold tracking-wider break-all py-4 px-6 rounded-xl bg-dark-800 min-h-[80px] flex items-center justify-center">
+                                    点击生成密码
+                                </div>
+                                <div class="mt-4 flex items-center justify-center space-x-4">
+                                    <button onclick="generatePassword()" class="btn-primary px-6 py-3 rounded-xl font-medium flex items-center space-x-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        <span>生成密码</span>
+                                    </button>
+                                    <button onclick="copyPassword()" class="px-6 py-3 rounded-xl font-medium flex items-center space-x-2 bg-dark-700 hover:bg-dark-600 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>复制</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-sm font-medium">密码长度: <span id="pwd-length-value" class="text-accent">16</span></label>
+                                </div>
+                                <input type="range" id="pwd-length" min="4" max="64" value="16" class="w-full" oninput="updatePwdLength()">
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>4</span>
+                                    <span>32</span>
+                                    <span>64</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex items-center space-x-3 p-3 rounded-lg bg-dark-800 cursor-pointer hover:bg-dark-700 transition-colors">
+                                    <input type="checkbox" id="pwd-uppercase" checked class="w-5 h-5 rounded bg-dark-600">
+                                    <span>大写字母 (A-Z)</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 rounded-lg bg-dark-800 cursor-pointer hover:bg-dark-700 transition-colors">
+                                    <input type="checkbox" id="pwd-lowercase" checked class="w-5 h-5 rounded bg-dark-600">
+                                    <span>小写字母 (a-z)</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 rounded-lg bg-dark-800 cursor-pointer hover:bg-dark-700 transition-colors">
+                                    <input type="checkbox" id="pwd-numbers" checked class="w-5 h-5 rounded bg-dark-600">
+                                    <span>数字 (0-9)</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 rounded-lg bg-dark-800 cursor-pointer hover:bg-dark-700 transition-colors">
+                                    <input type="checkbox" id="pwd-symbols" checked class="w-5 h-5 rounded bg-dark-600">
+                                    <span>特殊字符 (!@#$...)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-panel rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium">密码强度</span>
+                                <span id="pwd-strength-text" class="text-sm">-</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-dark-800 overflow-hidden">
+                                <div id="pwd-strength-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel rounded-xl p-4">
+                        <h3 class="text-lg font-semibold mb-3">历史记录</h3>
+                        <div id="password-history" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
+                            <div class="text-center text-gray-400 text-sm py-8">暂无历史记录</div>
+                        </div>
+                        <button onclick="clearPasswordHistory()" class="w-full mt-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors text-sm">
+                            清空历史
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // Tool Switching
+        function switchTool(toolId) {
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`nav-${toolId}`).classList.add('active');
+            
+            document.querySelectorAll('.tool-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`tool-${toolId}`).classList.remove('hidden');
+            document.getElementById(`tool-${toolId}`).classList.add('animate-fade-in');
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            toast.className = `toast ${bgColor} text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2`;
+            toast.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Copy to Clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && element.value) {
+                navigator.clipboard.writeText(element.value).then(() => {
+                    showToast('已复制到剪贴板');
+                });
+            }
+        }
+
+        function copyText(text) {
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('已复制到剪贴板');
+                });
+            }
+        }
+
+        // JSON Formatter
+        function jsonFormat() {
+            const input = document.getElementById('json-input').value;
+            const errorDiv = document.getElementById('json-error');
+            const output = document.getElementById('json-output');
+            
+            if (!input.trim()) {
+                errorDiv.textContent = '请输入JSON内容';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(input);
+                output.value = JSON.stringify(parsed, null, 2);
+                errorDiv.classList.add('hidden');
+            } catch (e) {
+                errorDiv.textContent = 'JSON格式错误: ' + e.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function jsonCompress() {
+            const input = document.getElementById('json-input').value;
+            const errorDiv = document.getElementById('json-error');
+            const output = document.getElementById('json-output');
+            
+            if (!input.trim()) {
+                errorDiv.textContent = '请输入JSON内容';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(input);
+                output.value = JSON.stringify(parsed);
+                errorDiv.classList.add('hidden');
+            } catch (e) {
+                errorDiv.textContent = 'JSON格式错误: ' + e.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function jsonClear() {
+            document.getElementById('json-input').value = '';
+            document.getElementById('json-output').value = '';
+            document.getElementById('json-error').classList.add('hidden');
+        }
+
+        // Timestamp Converter
+        function updateCurrentTime() {
+            const now = new Date();
+            const tsSeconds = Math.floor(now.getTime() / 1000);
+            const tsMilliseconds = now.getTime();
+            
+            document.getElementById('current-time').textContent = now.toLocaleString('zh-CN');
+            document.getElementById('ts-seconds').textContent = tsSeconds;
+            document.getElementById('ts-milliseconds').textContent = tsMilliseconds;
+            document.getElementById('ts-iso').textContent = now.toISOString();
+            document.getElementById('ts-local').textContent = now.toLocaleString('zh-CN');
+        }
+
+        function timestampToDate() {
+            const input = document.getElementById('timestamp-input').value.trim();
+            const resultDiv = document.getElementById('timestamp-result');
+            
+            if (!input || isNaN(input)) {
+                resultDiv.innerHTML = '<span class="text-red-400">请输入有效的时间戳</span>';
+                return;
+            }
+            
+            let timestamp = parseInt(input);
+            if (input.length === 10) {
+                timestamp *= 1000;
+            }
+            
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) {
+                resultDiv.innerHTML = '<span class="text-red-400">无效的时间戳</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="space-y-1">
+                    <div class="text-accent font-mono">${date.toLocaleString('zh-CN')}</div>
+                    <div class="text-sm text-gray-400">ISO: ${date.toISOString()}</div>
+                </div>
+            `;
+        }
+
+        function dateToTimestamp() {
+            const input = document.getElementById('date-input').value;
+            const resultDiv = document.getElementById('date-result');
+            
+            if (!input) {
+                resultDiv.innerHTML = '<span class="text-red-400">请选择日期时间</span>';
+                return;
+            }
+            
+            const date = new Date(input);
+            if (isNaN(date.getTime())) {
+                resultDiv.innerHTML = '<span class="text-red-400">无效的日期</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="space-y-1">
+                    <div class="text-accent font-mono">秒: ${Math.floor(date.getTime() / 1000)}</div>
+                    <div class="text-accent font-mono">毫秒: ${date.getTime()}</div>
+                </div>
+            `;
+        }
+
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime();
+
+        // Color Converter
+        let currentColor = { r: 255, g: 87, b: 51, a: 1 };
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = Math.round(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('').toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function updateColorPreview() {
+            const { r, g, b, a } = currentColor;
+            const rgba = `rgba(${r}, ${g}, ${b}, ${a})`;
+            document.getElementById('color-preview').style.backgroundColor = rgba;
+            
+            const hex = rgbToHex(r, g, b);
+            const hsl = rgbToHsl(r, g, b);
+            
+            document.getElementById('color-hex').value = hex.replace('#', '');
+            document.getElementById('color-rgb').value = `${r}, ${g}, ${b}`;
+            document.getElementById('color-hsl').value = `${hsl.h}, ${hsl.s}%, ${hsl.l}%`;
+            
+            document.getElementById('css-hex').textContent = `color: ${hex};`;
+            document.getElementById('css-rgb').textContent = `color: rgb(${r}, ${g}, ${b});`;
+            document.getElementById('css-hsl').textContent = `color: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%);`;
+        }
+
+        function setColor(hex) {
+            const rgb = hexToRgb(hex);
+            if (rgb) {
+                currentColor = { ...rgb, a: 1 };
+                document.getElementById('color-alpha').value = 100;
+                document.getElementById('alpha-value').textContent = '100%';
+                updateColorPreview();
+            }
+        }
+
+        document.getElementById('color-hex').addEventListener('input', (e) => {
+            let hex = e.target.value.replace('#', '');
+            if (hex.length === 6) {
+                const rgb = hexToRgb('#' + hex);
+                if (rgb) {
+                    currentColor = { ...rgb, a: currentColor.a };
+                    updateColorPreview();
+                }
+            }
+        });
+
+        document.getElementById('color-rgb').addEventListener('input', (e) => {
+            const match = e.target.value.match(/(\d+),\s*(\d+),\s*(\d+)/);
+            if (match) {
+                currentColor = {
+                    r: parseInt(match[1]),
+                    g: parseInt(match[2]),
+                    b: parseInt(match[3]),
+                    a: currentColor.a
+                };
+                updateColorPreview();
+            }
+        });
+
+        document.getElementById('color-hsl').addEventListener('input', (e) => {
+            const match = e.target.value.match(/(\d+),\s*(\d+)%,\s*(\d+)%/);
+            if (match) {
+                const rgb = hslToRgb(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
+                currentColor = { ...rgb, a: currentColor.a };
+                updateColorPreview();
+            }
+        });
+
+        document.getElementById('color-alpha').addEventListener('input', (e) => {
+            currentColor.a = e.target.value / 100;
+            document.getElementById('alpha-value').textContent = e.target.value + '%';
+            updateColorPreview();
+        });
+
+        updateColorPreview();
+
+        // Base64
+        function textToBase64() {
+            const text = document.getElementById('base64-text').value;
+            const urlSafe = document.getElementById('base64-urlsafe').checked;
+            
+            if (!text) {
+                showToast('请输入要编码的文本', 'error');
+                return;
+            }
+            
+            try {
+                let encoded = btoa(unescape(encodeURIComponent(text)));
+                if (urlSafe) {
+                    encoded = encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                }
+                document.getElementById('base64-encoded').value = encoded;
+                updateBase64Info(text, encoded);
+            } catch (e) {
+                showToast('编码失败: ' + e.message, 'error');
+            }
+        }
+
+        function base64ToText() {
+            const encoded = document.getElementById('base64-encoded').value;
+            const urlSafe = document.getElementById('base64-urlsafe').checked;
+            
+            if (!encoded) {
+                showToast('请输入要解码的Base64', 'error');
+                return;
+            }
+            
+            try {
+                let base64 = encoded;
+                if (urlSafe) {
+                    base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                    while (base64.length % 4) base64 += '=';
+                }
+                const text = decodeURIComponent(escape(atob(base64)));
+                document.getElementById('base64-text').value = text;
+                updateBase64Info(text, encoded);
+            } catch (e) {
+                showToast('解码失败: 无效的Base64字符串', 'error');
+            }
+        }
+
+        function updateBase64Info(text, encoded) {
+            document.getElementById('base64-char-count').textContent = text.length;
+            document.getElementById('base64-byte-count').textContent = new Blob([text]).size;
+            document.getElementById('base64-ratio').textContent = Math.round((encoded.length / text.length - 1) * 100) + '%';
+        }
+
+        // Regex Tester
+        function updateRegexFlags() {
+            const flags = [];
+            if (document.getElementById('flag-g').checked) flags.push('g');
+            if (document.getElementById('flag-i').checked) flags.push('i');
+            if (document.getElementById('flag-m').checked) flags.push('m');
+            document.getElementById('regex-flags').value = flags.join('');
+            testRegex();
+        }
+
+        function testRegex() {
+            const pattern = document.getElementById('regex-pattern').value;
+            const flags = document.getElementById('regex-flags').value;
+            const text = document.getElementById('regex-text').value;
+            const resultDiv = document.getElementById('regex-result');
+            
+            if (!pattern || !text) {
+                resultDiv.innerHTML = '<span class="text-gray-500">输入正则表达式和测试文本查看结果...</span>';
+                return;
+            }
+            
+            try {
+                const regex = new RegExp(pattern, flags);
+                const matches = [];
+                let match;
+                
+                if (flags.includes('g')) {
+                    while ((match = regex.exec(text)) !== null) {
+                        matches.push({
+                            text: match[0],
+                            index: match.index,
+                            groups: match.slice(1)
+                        });
+                        if (match.index === regex.lastIndex) regex.lastIndex++;
+                    }
+                } else {
+                    match = regex.exec(text);
+                    if (match) {
+                        matches.push({
+                            text: match[0],
+                            index: match.index,
+                            groups: match.slice(1)
+                        });
+                    }
+                }
+                
+                if (matches.length === 0) {
+                    resultDiv.innerHTML = '<span class="text-yellow-400">未找到匹配</span>';
+                } else {
+                    let html = `<div class="text-green-400 mb-2">找到 ${matches.length} 个匹配</div>`;
+                    html += '<div class="space-y-2">';
+                    matches.forEach((m, i) => {
+                        html += `
+                            <div class="p-2 rounded bg-dark-800">
+                                <div class="text-accent font-mono">#${i + 1}: "${m.text}"</div>
+                                <div class="text-xs text-gray-400">位置: ${m.index}</div>
+                                ${m.groups.length > 0 ? `<div class="text-xs text-gray-400">分组: ${m.groups.join(', ')}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span class="text-red-400">正则表达式错误: ${e.message}</span>`;
+            }
+        }
+
+        function setRegex(pattern) {
+            document.getElementById('regex-pattern').value = pattern;
+            testRegex();
+        }
+
+        document.getElementById('regex-pattern').addEventListener('input', testRegex);
+        document.getElementById('regex-text').addEventListener('input', testRegex);
+        document.getElementById('regex-flags').addEventListener('input', testRegex);
+
+        // Password Generator
+        let passwordHistory = [];
+
+        function updatePwdLength() {
+            document.getElementById('pwd-length-value').textContent = document.getElementById('pwd-length').value;
+        }
+
+        function generatePassword() {
+            const length = parseInt(document.getElementById('pwd-length').value);
+            const useUpper = document.getElementById('pwd-uppercase').checked;
+            const useLower = document.getElementById('pwd-lowercase').checked;
+            const useNumbers = document.getElementById('pwd-numbers').checked;
+            const useSymbols = document.getElementById('pwd-symbols').checked;
+            
+            if (!useUpper && !useLower && !useNumbers && !useSymbols) {
+                showToast('请至少选择一种字符类型', 'error');
+                return;
+            }
+            
+            const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const lower = 'abcdefghijklmnopqrstuvwxyz';
+            const numbers = '0123456789';
+            const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            let chars = '';
+            if (useUpper) chars += upper;
+            if (useLower) chars += lower;
+            if (useNumbers) chars += numbers;
+            if (useSymbols) chars += symbols;
+            
+            let password = '';
+            const array = new Uint32Array(length);
+            crypto.getRandomValues(array);
+            
+            for (let i = 0; i < length; i++) {
+                password += chars[array[i] % chars.length];
+            }
+            
+            document.getElementById('password-display').textContent = password;
+            checkPasswordStrength(password);
+            addToPasswordHistory(password);
+        }
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const checks = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                symbol: /[^A-Za-z0-9]/.test(password)
+            };
+            
+            strength = Object.values(checks).filter(Boolean).length;
+            
+            const bar = document.getElementById('pwd-strength-bar');
+            const text = document.getElementById('pwd-strength-text');
+            
+            const strengthLevels = ['极弱', '弱', '一般', '强', '极强'];
+            const strengthClasses = ['strength-weak', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+            
+            text.textContent = strengthLevels[strength - 1] || '极弱';
+            bar.className = `h-full rounded-full transition-all duration-300 ${strengthClasses[strength - 1] || 'strength-weak'}`;
+            bar.style.width = (strength * 20) + '%';
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('password-display').textContent;
+            if (password && password !== '点击生成密码') {
+                navigator.clipboard.writeText(password).then(() => {
+                    showToast('密码已复制');
+                });
+            }
+        }
+
+        function addToPasswordHistory(password) {
+            passwordHistory.unshift(password);
+            if (passwordHistory.length > 10) passwordHistory.pop();
+            updatePasswordHistoryUI();
+        }
+
+        function updatePasswordHistoryUI() {
+            const container = document.getElementById('password-history');
+            if (passwordHistory.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-8">暂无历史记录</div>';
+                return;
+            }
+            
+            container.innerHTML = passwordHistory.map((pwd, i) => `
+                <div class="flex items-center justify-between p-2 rounded-lg bg-dark-800 hover:bg-dark-700 transition-colors">
+                    <span class="font-mono text-sm truncate flex-1 mr-2">${pwd}</span>
+                    <button onclick="copyText('${pwd}')" class="p-1 hover:bg-dark-600 rounded" title="复制">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function clearPasswordHistory() {
+            passwordHistory = [];
+            updatePasswordHistoryUI();
+            showToast('历史记录已清空');
+        }
+    </script>
+</body>
+</html>

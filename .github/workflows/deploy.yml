@@ -1,0 +1,57 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add host to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.REMOTE_HOST }}
+          SERVER_USER: ${{ secrets.REMOTE_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_TARGET }}
+        run: |
+          echo "Starting deployment..."
+          
+          # 使用 rsync 部署文件到服务器
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='README.md' \
+            --exclude='.gitignore' \
+            ./ $REMOTE_USER@$REMOTE_HOST:$DEPLOY_TARGET
+          
+          echo "Deployment completed successfully!"
+      
+      - name: Verify deployment
+        env:
+          SERVER_HOST: ${{ secrets.REMOTE_HOST }}
+          SERVER_USER: ${{ secrets.REMOTE_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_TARGET }}
+        run: |
+          # 验证部署是否成功
+          ssh $REMOTE_USER@$REMOTE_HOST "ls -la $DEPLOY_TARGET"
+          echo "Deployment verified!"
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "Deployment completed successfully at $(date)"
