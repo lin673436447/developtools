@@ -25,9 +25,9 @@ jobs:
       
       - name: Deploy to server
         env:
-          SERVER_HOST: ${{ secrets.REMOTE_HOST }}
-          SERVER_USER: ${{ secrets.REMOTE_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_TARGET }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET }}
         run: |
           echo "Starting deployment..."
           
@@ -43,9 +43,9 @@ jobs:
       
       - name: Verify deployment
         env:
-          SERVER_HOST: ${{ secrets.REMOTE_HOST }}
-          SERVER_USER: ${{ secrets.REMOTE_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_TARGET }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET }}
         run: |
           # 验证部署是否成功
           ssh $REMOTE_USER@$REMOTE_HOST "ls -la $DEPLOY_TARGET"
